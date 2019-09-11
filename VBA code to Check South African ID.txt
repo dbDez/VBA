@@ -1,0 +1,66 @@
+
+
+Private Sub SAIDNumber_BeforeUpdate(Cancel As Integer)
+    If Not IsNull(Me.SAIDNumber) = True Then
+        If Len(Me.SAIDNumber) = 13 Then
+            If Not IsNumeric(Me.SAIDNumber) Then
+                MsgBox "An ID Number may only contain digits", , "Invalid ID"
+                Me.Undo
+                Exit Sub
+            End If
+            Dim Birthdate1 As Date
+            Dim BirthDate2 As Date
+            Dim AgeBefore2000 As Integer
+            Dim AgeAfter2000 As Integer
+            Dim After2000Check As Integer
+            Dim Sex As String
+            Dim Citizen As String
+            Dim SexCheck As Integer
+            Dim Citizencheck As Integer
+            'If the person was born before 2000 then set the year to 19
+            Birthdate1 = "19" & Left(Me.SAIDNumber, 2) & "/" & Mid(Me.SAIDNumber, 3, 2) & "/" & Mid(Me.SAIDNumber, 5, 2)
+            AgeBefore2000 = Year(Now()) - Year(Birthdate1)
+            'Set a check to see if a person was born on or afer 2000
+            After2000Check = 0 ' 0=Not
+            ' Set the Second Birthdate to 0 to use as a check
+            If Left(Me.SAIDNumber, 2) <= Right(Year(Now()), 2) And Left(Me.SAIDNumber, 2) >= 0 Then
+                After2000Check = 1 ' 1=Yes
+                BirthDate2 = "20" & Left$(Me.SAIDNumber, 2) & "/" & Mid(Me.SAIDNumber, 3, 2) & "/" & Mid(Me.SAIDNumber, 5, 2)
+                AgeAfter2000 = Year(Now()) - Year(BirthDate2)
+            End If
+            SexCheck = Mid(Me.SAIDNumber, 7, 1)
+            If SexCheck >= 5 Then
+                Sex = "Male"
+            Else
+                Sex = "Female"
+            End If
+                
+            Citizencheck = Mid(Me.SAIDNumber, 11, 1)
+            If Citizencheck = 0 Then
+                Citizen = "South African"
+            Else
+                Citizen = "Non South African"
+            End If
+            If CheckSouthAfricanIDNumber(Me.SAIDNumber) = True Then
+                If After2000Check = 0 Then
+                    MsgBox "The ID Number is Valid" & vbCrLf & "Age: " & AgeBefore2000 & vbCrLf & Sex & vbCrLf & Citizen & vbCrLf & _
+                    "BirthDay: " & Birthdate1, , "ID Number is Valid"
+                Else
+                    MsgBox "The ID Number is Valid" & vbCrLf & "Age: " & AgeAfter2000 & vbCrLf & Sex & vbCrLf & Citizen & vbCrLf & _
+                    "BirthDay: " & BirthDate2, , "ID Number is Valid"
+                End If
+            Else
+                MsgBox "This number is not valid - please check and try again", vbExclamation, "False ID Number"
+                Cancel = True
+            End If
+        Else
+            MsgBox "The ID Numer you have entered is too short. Please try again", vbExclamation, "ID Number too short"
+                Cancel = True
+        End If
+    End If
+End Sub
+
+Private Sub SAIDNumber_Click()
+    Me.SAIDNumber.SelStart = 0
+    'Me.SAIDNumber.SelLength = 0
+End Sub
